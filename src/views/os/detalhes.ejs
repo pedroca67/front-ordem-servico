@@ -1,0 +1,116 @@
+<%- include("../partials/header") %>
+
+    <div class="box">
+        <div class="level">
+            <div class="level-left">
+                <h1 class="title">Ordem de Serviço #<%= ordem.id %>
+                </h1>
+            </div>
+            <div class="level-right">
+                <% if (ordem.status !=='CONCLUIDA' && ordem.status !=='CANCELADA' ) { %>
+                    <form action="/os/<%= ordem.id %>/status" method="POST" class="is-flex">
+                        <div class="select mr-2">
+                            <select name="status">
+                                <option value="ABERTA" <%=ordem.status==='ABERTA' ? 'selected' : '' %>>ABERTA</option>
+                                <option value="EM_ANDAMENTO" <%=ordem.status==='EM_ANDAMENTO' ? 'selected' : '' %>>EM
+                                    ANDAMENTO</option>
+                                <option value="AGUARDANDO_PECAS" <%=ordem.status==='AGUARDANDO_PECAS' ? 'selected' : ''
+                                    %>>AGUARDANDO PEÇAS</option>
+                                <option value="CONCLUIDA" <%=ordem.status==='CONCLUIDA' ? 'selected' : '' %>>CONCLUÍDA
+                                </option>
+                                <option value="CANCELADA" <%=ordem.status==='CANCELADA' ? 'selected' : '' %>>CANCELADA
+                                </option>
+                            </select>
+                        </div>
+                        <button type="submit" class="button is-link is-light">Atualizar Status</button>
+                    </form>
+                    <% } else { %>
+                        <span class="tag is-large <%= ordem.status === 'CONCLUIDA' ? 'is-success' : 'is-danger' %>">
+                            <%= ordem.status %>
+                        </span>
+                        <% } %>
+            </div>
+        </div>
+
+        <hr>
+
+        <div class="columns">
+            <div class="column">
+                <p><strong>Cliente:</strong>
+                    <%= ordem.cliente ? ordem.cliente.nome : 'N/A' %>
+                </p>
+                <p><strong>Valor:</strong> R$ <%= ordem.valor %>
+                </p>
+            </div>
+            <div class="column">
+                <p><strong>Abertura:</strong>
+                    <%= new Date(ordem.dataAbertura).toLocaleString('pt-BR') %>
+                </p>
+                <p><strong>Status Atual:</strong>
+                    <span class="tag <%= ordem.status === 'CONCLUIDA' ? 'is-success' : 'is-warning' %>">
+                        <%= ordem.status %>
+                    </span>
+                </p>
+            </div>
+        </div>
+
+        <div class="content">
+            <h4>Descrição do Problema</h4>
+            <p class="notification">
+                <%= ordem.descricaoProblema %>
+            </p>
+
+            <h4>Observações Técnicas</h4>
+            <p class="notification is-info is-light">
+                <%= ordem.observacoes || 'Sem observações.' %>
+            </p>
+        </div>
+
+        <hr>
+
+        <div class="field is-grouped">
+            <div class="control">
+                <a href="/os" class="button is-light">Voltar</a>
+            </div>
+
+            <% if (ordem.status !=='CONCLUIDA' && ordem.status !=='CANCELADA' ) { %>
+                <div class="control">
+                    <a href="/os/<%= ordem.id %>/editar" class="button is-warning">Editar OS</a>
+                </div>
+                <div class="control">
+                    <button class="button is-danger" onclick="toggleModal()">Excluir Ordem</button>
+                </div>
+                <% } else { %>
+                    <div class="control">
+                        <button class="button is-static">OS Finalizada (Edição bloqueada)</button>
+                    </div>
+                    <% } %>
+        </div>
+
+        <div class="modal" id="modal-excluir">
+            <div class="modal-background" onclick="toggleModal()"></div>
+            <div class="modal-card">
+                <header class="modal-card-head">
+                    <p class="modal-card-title">Confirmar Exclusão</p>
+                    <button class="delete" aria-label="close" onclick="toggleModal()"></button>
+                </header>
+                <section class="modal-card-body">
+                    Tem certeza que deseja excluir a <strong>Ordem de Serviço #<%= ordem.id %></strong>? Esta ação não
+                    pode ser desfeita.
+                </section>
+                <footer class="modal-card-foot">
+                    <form action="/os/<%= ordem.id %>/excluir" method="POST">
+                        <button type="submit" class="button is-danger">Sim, Excluir</button>
+                        <button type="button" class="button" onclick="toggleModal()">Cancelar</button>
+                    </form>
+                </footer>
+            </div>
+        </div>
+
+        <script>
+            function toggleModal() {
+                document.getElementById('modal-excluir').classList.toggle('is-active');
+            }
+        </script>
+
+        <%- include("../partials/footer") %>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Sistema OS</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="has-background-light" style="height: 100vh; display: flex; align-items: center; justify-content: center;">
+
+    <div class="column is-4">
+        <div class="box has-text-centered">
+            <i class="fa-solid fa-screwdriver-wrench fa-3x mb-4 has-text-primary"></i>
+            <h1 class="title">Sistema OS</h1>
+            
+            <% if (typeof erro !== 'undefined') { %>
+                <div class="notification is-danger is-light">
+                    <%= erro %>
+                </div>
+            <% } %>
+
+            <form action="/login" method="POST">
+                <div class="field">
+                    <div class="control has-icons-left">
+                        <input class="input" type="text" name="username" placeholder="Usuário" required>
+                        <span class="icon is-left"><i class="fas fa-user"></i></span>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <div class="control has-icons-left">
+                        <input class="input" type="password" name="password" placeholder="Senha" required>
+                        <span class="icon is-left"><i class="fas fa-lock"></i></span>
+                    </div>
+                </div>
+
+                <button type="submit" class="button is-primary is-fullwidth">Entrar</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

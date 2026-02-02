@@ -1,0 +1,45 @@
+<%- include("partials/header") %>
+
+<section class="section">
+    <h1 class="title">Bem-vindo ao Sistema OS</h1>
+    <h2 class="subtitle">Resumo das atividades da sua assistência</h2>
+
+    <div class="columns is-multiline">
+        <div class="column is-4">
+            <div class="notification is-primary is-light">
+                <p class="heading">Total de Clientes</p>
+                <p class="title"><%= totalClientes %></p>
+            </div>
+        </div>
+
+        <div class="column is-4">
+            <div class="notification is-warning is-light">
+                <p class="heading">Ordens em Aberto</p>
+                <p class="title"><%= osAbertas %></p>
+            </div>
+        </div>
+
+        <div class="column is-4">
+            <div class="notification is-success is-light">
+                <p class="heading">Faturamento (Concluídas)</p>
+                <p class="title">R$ <%= faturamento %></p>
+            </div>
+        </div>
+    </div>
+
+    <hr>
+
+    <div class="columns">
+        <div class="column">
+            <div class="box">
+                <h3 class="subtitle">Ações Rápidas</h3>
+                <div class="buttons">
+                    <a href="/os/nova" class="button is-link">Abrir Nova OS</a>
+                    <a href="/clientes/novo" class="button is-primary">Cadastrar Cliente</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<%- include("partials/footer") %>

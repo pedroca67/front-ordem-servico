@@ -1,0 +1,81 @@
+<%- include("../partials/header") %>
+
+<h1 class="title">Relatórios Financeiros</h1>
+
+<div class="box">
+    <form action="/relatorios" method="GET">
+        <div class="columns is-vcentered">
+            <div class="column">
+                <div class="field">
+                    <label class="label">Data Início</label>
+                    <div class="control">
+                        <input class="input" type="date" name="dataInicio" value="<%= filtros.dataInicio %>" required>
+                    </div>
+                </div>
+            </div>
+            <div class="column">
+                <div class="field">
+                    <label class="label">Data Fim</label>
+                    <div class="control">
+                        <input class="input" type="date" name="dataFim" value="<%= filtros.dataFim %>" required>
+                    </div>
+                </div>
+            </div>
+            <div class="column is-narrow">
+                <button type="submit" class="button is-primary mt-4">
+                    <i class="fa fa-refresh mr-2"></i> Gerar Relatório
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<% if (filtros.dataInicio) { %>
+    <div class="columns">
+        <div class="column is-4">
+            <div class="notification is-success is-light has-text-centered">
+                <p class="heading">Faturamento Total</p>
+                <p class="title">R$ <%= Number(dados.total).toLocaleString('pt-BR', {minimumFractionDigits: 2}) %></p>
+            </div>
+        </div>
+        <div class="column is-4">
+            <div class="notification is-info is-light has-text-centered">
+                <p class="heading">Ordens Concluídas</p>
+                <p class="title"><%= dados.ordens.length %></p>
+            </div>
+        </div>
+    </div>
+
+    <div class="box">
+        <h3 class="subtitle">Lista de Ordens do Período</h3>
+        <table class="table is-fullwidth is-striped is-hoverable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Cliente</th>
+                    <th>Conclusão</th>
+                    <th>Valor</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% dados.ordens.forEach(o => { %>
+                    <tr>
+                        <td>#<%= o.id %></td>
+                        <td><%= o.cliente ? o.cliente.nome : 'N/A' %></td>
+                        <td><%= new Date(o.dataConclusao).toLocaleDateString('pt-BR') %></td>
+                        <td>R$ <%= o.valor %></td>
+                        <td><a href="/os/<%= o.id %>" class="button is-small is-light">Ver</a></td>
+                    </tr>
+                <% }) %>
+                <% if(dados.ordens.length === 0) { %>
+                    <tr>
+                        <td colspan="5" class="has-text-centered">Nenhuma ordem concluída encontrada neste intervalo.</td>
+                    </tr>
+                <% } %>
+            </tbody>
+        </table>
+    </div>
+<% } %>
+
+<%- include("../partials/footer") %>

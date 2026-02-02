@@ -1,0 +1,59 @@
+<%- include("../partials/header") %>
+
+<div class="box">
+    <h1 class="title">Editar Cliente</h1>
+
+    <form action="/clientes/<%= cliente.id %>/editar" method="POST">
+        <div class="field">
+            <label class="label">Nome</label>
+            <div class="control">
+                <input class="input" type="text" name="nome" value="<%= cliente.nome %>" required>
+            </div>
+        </div>
+
+        <div class="columns">
+            <div class="column">
+                <div class="field">
+                    <label class="label">CPF</label>
+                    <div class="control">
+                        <input class="input" type="text" name="cpf" value="<%= cliente.cpf %>" readonly>
+                        <p class="help">O CPF não pode ser alterado por segurança.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="column">
+                <div class="field">
+                    <label class="label">Telefone</label>
+                    <div class="control">
+                        <input class="input" type="text" name="telefone" value="<%= cliente.telefone %>">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="field">
+            <label class="label">E-mail</label>
+            <div class="control">
+                <input class="input" type="email" name="email" value="<%= cliente.email %>" required>
+            </div>
+        </div>
+
+        <div class="field">
+            <label class="label">Endereço</label>
+            <div class="control">
+                <input class="input" type="text" name="endereco" value="<%= cliente.endereco %>">
+            </div>
+        </div>
+
+        <div class="field is-grouped">
+            <div class="control">
+                <button class="button is-warning" type="submit">Atualizar Dados</button>
+            </div>
+            <div class="control">
+                <a href="/clientes" class="button is-light">Cancelar</a>
+            </div>
+        </div>
+    </form>
+</div>
+
+<%- include("../partials/footer") %>

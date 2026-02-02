@@ -1,0 +1,131 @@
+<%- include("../partials/header") %>
+
+<div class="level">
+    <div class="level-left">
+        <h1 class="title">Ordens de Serviço</h1>
+    </div>
+    <div class="level-right">
+        <div class="field is-grouped">
+            <p class="control">
+                <div class="select">
+                    <select id="filtroStatus" onchange="filtrarTabela()">
+                        <option value="">Todos os Status</option>
+                        <option value="ABERTA">ABERTA</option>
+                        <option value="EM_ANDAMENTO">EM ANDAMENTO</option>
+                        <option value="AGUARDANDO_PECAS">AGUARDANDO PEÇAS</option>
+                        <option value="CONCLUIDA">CONCLUÍDA</option>
+                        <option value="CANCELADA">CANCELADA</option>
+                    </select>
+                </div>
+            </p>
+
+            <div class="field has-addons">
+                <p class="control">
+                    <span class="button is-static">
+                        <i class="fa fa-search"></i>
+                    </span>
+                </p>
+                <p class="control">
+                    <input class="input" type="text" id="filtroOS" onkeyup="filtrarTabela()" placeholder="Buscar por ID, Cliente ou CPF...">
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="box">
+    <table class="table is-fullwidth is-striped is-hoverable" id="tabela-os">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Cliente</th>
+                <th>Valor</th>
+                <th>Status</th>
+                <th>Data Abertura</th>
+                <th class="has-text-centered">Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% ordens.forEach(o => { %>
+                <tr>
+                    <td><strong>#<%= o.id %></strong></td>
+                    <td>
+                        <%= o.cliente ? o.cliente.nome : 'N/A' %>
+                        <% if(o.cliente) { %>
+                            <span style="display:none"><%= o.cliente.cpf %></span>
+                        <% } %>
+                    </td>
+                    <td><strong>R$ <%= o.valor %></strong></td>
+                    <td>
+                        <% 
+                            let corTag = 'is-warning'; // Amarelo (Padrão para EM_ANDAMENTO)
+                            if (o.status === 'CONCLUIDA') corTag = 'is-success'; // Verde
+                            if (o.status === 'CANCELADA') corTag = 'is-danger';  // Vermelho
+                            if (o.status === 'ABERTA') corTag = 'is-info';      // Azul
+                            if (o.status === 'AGUARDANDO_PECAS') corTag = 'is-dark'; // Cinza Escuro
+                        %>
+                        <span class="tag <%= corTag %> has-text-weight-bold">
+                            <%= o.status %>
+                        </span>
+                    </td>
+                    <td><%= new Date(o.dataAbertura).toLocaleDateString('pt-BR') %></td>
+                    <td class="has-text-centered">
+                        <a href="/os/<%= o.id %>" class="button is-small is-link is-light">
+                            <i class="fa-solid fa-eye mr-1"></i> Detalhes
+                        </a>
+                    </td>
+                </tr>
+            <% }) %>
+            <% if (ordens.length === 0) { %>
+                <tr>
+                    <td colspan="6" class="has-text-centered">Nenhuma ordem de serviço encontrada.</td>
+                </tr>
+            <% } %>
+        </tbody>
+    </table>
+</div>
+
+
+
+<script>
+function filtrarTabela() {
+    // 1. Pega os valores dos filtros
+    const inputTexto = document.getElementById("filtroOS");
+    const filterTexto = inputTexto.value.toUpperCase().replace(/[.\-/]/g, "");
+    
+    const inputStatus = document.getElementById("filtroStatus");
+    const filterStatus = inputStatus.value.toUpperCase();
+
+    const table = document.getElementById("tabela-os");
+    const tr = table.getElementsByTagName("tr");
+
+    for (let i = 1; i < tr.length; i++) {
+        const tdId = tr[i].getElementsByTagName("td")[0];   
+        const tdNome = tr[i].getElementsByTagName("td")[1]; 
+        const tdStatus = tr[i].getElementsByTagName("td")[3]; 
+        
+        if (tdId && tdNome && tdStatus) {
+            const txtValueId = (tdId.textContent || tdId.innerText).toUpperCase();
+            const txtValueNome = (tdNome.textContent || tdNome.innerText).toUpperCase();
+            const txtValueStatus = (tdStatus.textContent || tdStatus.innerText).toUpperCase().trim();
+            
+            const txtValueNomeLimpo = txtValueNome.replace(/[.\-/]/g, "");
+
+            // Lógica: Texto bate (ID/Nome/CPF) E Status bate
+            const bateTexto = txtValueId.indexOf(filterTexto) > -1 || 
+                             txtValueNome.indexOf(filterTexto) > -1 ||
+                             txtValueNomeLimpo.indexOf(filterTexto) > -1;
+            
+            const bateStatus = filterStatus === "" || txtValueStatus === filterStatus;
+
+            if (bateTexto && bateStatus) {
+                tr[i].style.display = "";
+            } else {
+                tr[i].style.display = "none";
+            }
+        }
+    }
+}
+</script>
+
+<%- include("../partials/footer") %>

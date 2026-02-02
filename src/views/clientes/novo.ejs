@@ -1,0 +1,58 @@
+<%- include("../partials/header") %>
+
+<div class="box">
+    <h1 class="title">Novo Cliente</h1>
+
+    <form action="/clientes/novo" method="POST">
+        <div class="field">
+            <label class="label">Nome</label>
+            <div class="control">
+                <input class="input" type="text" name="nome" placeholder="Nome completo" required>
+            </div>
+        </div>
+
+        <div class="columns">
+            <div class="column">
+                <div class="field">
+                    <label class="label">CPF (somente números)</label>
+                    <div class="control">
+                        <input class="input" type="text" name="cpf" maxlength="11" required>
+                    </div>
+                </div>
+            </div>
+            <div class="column">
+                <div class="field">
+                    <label class="label">Telefone</label>
+                    <div class="control">
+                        <input class="input" type="text" name="telefone">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="field">
+            <label class="label">E-mail</label>
+            <div class="control">
+                <input class="input" type="email" name="email" required>
+            </div>
+        </div>
+
+        <div class="field">
+            <label class="label">Endereço</label>
+            <div class="control">
+                <input class="input" type="text" name="endereco" placeholder="Rua, número, bairro...">
+            </div>
+        </div>
+
+        <div class="field is-grouped">
+            <div class="control">
+                <button class="button is-primary" type="submit">Salvar Cliente</button>
+            </div>
+            <div class="control">
+                <a href="/clientes" class="button is-light">Cancelar</a>
+            </div>
+        </div>
+    </form>
+</div>
+
+<%- include("../partials/footer") %>

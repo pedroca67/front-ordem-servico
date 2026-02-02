@@ -1,0 +1,116 @@
+<%- include("../partials/header") %>
+
+<div class="box">
+    <h1 class="title">Abrir Nova Ordem de Serviço</h1>
+
+    <div id="secao-busca">
+        <div class="field">
+            <label class="label">Localizar Cliente (Nome ou CPF)</label>
+            <div class="field has-addons">
+                <div class="control is-expanded">
+                    <input class="input" type="text" id="input-busca" placeholder="Digite para pesquisar...">
+                </div>
+                <div class="control">
+                    <button type="button" class="button is-info" onclick="buscarClientes()">
+                        <i class="fa fa-search mr-2"></i> Buscar
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div id="resultado-busca" style="max-height: 200px; overflow-y: auto;">
+            </div>
+    </div>
+
+    <hr>
+
+    <form action="/os/nova" method="POST" id="form-completo" style="display: none;">
+        
+        <div class="notification is-success is-light">
+            <button type="button" class="delete" onclick="resetarBusca()"></button>
+            <strong>Cliente:</strong> <span id="nome-selecionado"></span> 
+            <input type="hidden" name="clienteId" id="cliente-id-input">
+        </div>
+
+        <div class="field">
+            <label class="label">Descrição do Problema</label>
+            <div class="control">
+                <textarea class="textarea" name="descricaoProblema" placeholder="Descreva o defeito ou serviço a ser feito..." required></textarea>
+            </div>
+        </div>
+
+        <div class="columns">
+            <div class="column">
+                <div class="field">
+                    <label class="label">Valor do Orçamento (R$)</label>
+                    <div class="control">
+                        <input class="input" type="number" step="0.01" name="valorOrcamento" placeholder="0,00" required>
+                    </div>
+                </div>
+            </div>
+            <div class="column">
+                <div class="field">
+                    <label class="label">Status Inicial</label>
+                    <div class="control">
+                        <div class="select is-fullwidth">
+                            <select name="status">
+                                <option value="ABERTA">ABERTA</option>
+                                <option value="EM_ANDAMENTO">EM ANDAMENTO</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="field">
+            <label class="label">Observações Técnicas</label>
+            <div class="control">
+                <textarea class="textarea" name="observacoes" placeholder="Notas adicionais (opcional)"></textarea>
+            </div>
+        </div>
+
+        <div class="field is-grouped">
+            <div class="control">
+                <button class="button is-primary" type="submit">Gerar Ordem de Serviço</button>
+            </div>
+            <div class="control">
+                <a href="/os" class="button is-light">Cancelar</a>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    async function buscarClientes() {
+        const query = document.getElementById('input-busca').value;
+        if (query.length < 2) return;
+
+        const res = await fetch(`/clientes/api/buscar?q=${query}`);
+        const clientes = await res.json();
+        
+        const container = document.getElementById('resultado-busca');
+        container.innerHTML = '';
+
+        clientes.forEach(c => {
+            const item = document.createElement('div');
+            item.className = 'box mb-2 p-2 is-clickable has-background-white-ter';
+            item.innerHTML = `<strong>${c.nome}</strong> <small>(CPF: ${c.cpf})</small> <button type="button" class="button is-small is-primary is-pulled-right">Selecionar</button>`;
+            item.onclick = () => {
+                document.getElementById('cliente-id-input').value = c.id;
+                document.getElementById('nome-selecionado').innerText = c.nome + " (CPF: " + c.cpf + ")";
+                document.getElementById('form-completo').style.display = 'block';
+                document.getElementById('secao-busca').style.display = 'none';
+                container.innerHTML = '';
+            };
+            container.appendChild(item);
+        });
+    }
+
+    function resetarBusca() {
+        document.getElementById('form-completo').style.display = 'none';
+        document.getElementById('secao-busca').style.display = 'block';
+        document.getElementById('input-busca').value = '';
+    }
+</script>
+
+<%- include("../partials/footer") %>

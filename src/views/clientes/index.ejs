@@ -1,0 +1,73 @@
+<%- include("../partials/header") %>
+
+  <div class="level">
+    <div class="level-left">
+      <h1 class="title">Clientes Cadastrados</h1>
+    </div>
+    <div class="level-right">
+      <a href="/clientes/novo" class="button is-primary">
+        <i class="fa fa-plus mr-2"></i>Novo Cliente
+      </a>
+    </div>
+  </div>
+
+  <table class="table is-fullwidth is-striped is-hoverable">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nome</th>
+        <th>CPF</th>
+        <th>Telefone</th>
+        <th>Email</th>
+        <th>Endereço</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if (clientes.length> 0) { %>
+        <% clientes.forEach(c=> { %>
+          <tr>
+            <td>
+              <%= c.id %>
+            </td>
+            <td><strong>
+                <%= c.nome %>
+              </strong></td>
+            <td>
+              <% if (locals.papel==='ADMIN' ) { %>
+                <%= c.cpf %>
+                  <% } else { %>
+                   <span class="has-text-grey-light">**********</span>
+                      <% } %>
+            </td>
+            <td>
+              <%= c.telefone %>
+            </td>
+            <td>
+              <%= c.email %>
+            </td>
+            <td>
+              <%= c.endereco %>
+            </td>
+            <td>
+              <div class="buttons">
+                <a href="/clientes/<%= c.id %>/editar" class="button is-small is-warning" title="Editar">
+                  <i class="fa fa-edit"></i>
+                </a>
+                <a href="/clientes/<%= c.id %>/excluir" class="button is-small is-danger" title="Excluir"
+                  onclick="return confirm('Tem certeza que deseja excluir este cliente?')">
+                  <i class="fa fa-trash"></i>
+                </a>
+              </div>
+            </td>
+          </tr>
+          <% }) %>
+            <% } else { %>
+              <tr>
+                <td colspan="7" class="has-text-centered">Nenhum cliente encontrado.</td>
+              </tr>
+              <% } %>
+    </tbody>
+  </table>
+
+  <%- include("../partials/footer") %>
