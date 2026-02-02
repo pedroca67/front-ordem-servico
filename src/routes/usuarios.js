@@ -2,38 +2,52 @@ const express = require('express');
 const router = express.Router();
 const api = require('../services/api');
 
-// Rota de Processamento de Login
-router.post('/login', async (req, res) => {
-    const { username, password } = req.body;
-
-    try {
-        // 1. Criamos a chave Base64 na hora para testar o login no Java
-        const authKey = Buffer.from(`${username}:${password}`).toString('base64');
-        const auth = { headers: { 'Authorization': `Basic ${authKey}` } };
-
-        // 2. Chamamos o Java para validar (Ex: um endpoint que retorna dados do user)
-        const response = await api.get(`/usuarios/me`, auth);
-
-        // 3. SE O LOGIN FOR SUCESSO:
-        // Guardamos a chave de autorização e os dados básicos (SEM A SENHA)
-        req.session.authKey = authKey;
-        req.session.usuarioLogado = {
-            nome: response.data.nome,
-            papel: response.data.role || response.data.papel // ajuste conforme seu DTO no Java
-        };
-
-        res.redirect('/dashboard');
-
-    } catch (error) {
-        console.error("Erro no login:", error.message);
-        res.render('login', { erro: "Usuário ou senha inválidos." });
-    }
+// Exibe o formulário de cadastro
+router.get('/novo', (req, res) => {
+    res.render('usuarios/novo', { 
+        paginaAtual: 'admin',
+        erro: null,
+        // Passamos os dados do locals para a view caso precise
+        usuario: res.locals.usuario,
+        papel: res.locals.papel
+    });
 });
 
-// Logout Seguro
-router.get('/logout', (req, res) => {
-    req.session.destroy(); // Mata a sessão e a authKey junto
-    res.redirect('/login');
+// Processa o salvamento no Spring Boot
+router.post('/salvar', async (req, res) => {
+    try {
+        // 1. Usamos a função centralizada para pegar a autorização (Basic Auth em Base64)
+        const auth = api.getAuth(req);
+
+        // 2. Montamos o objeto exatamente como o seu Controller no Java espera
+        const usuarioDTO = {
+            nome: req.body.username, // Usando o username como nome por enquanto
+            username: req.body.username,
+            senha: req.body.password, // Campo que o Java vai encriptar com BCrypt
+            role: req.body.papel      // Vem do <select name="papel"> no seu HTML
+        };
+
+        // 3. Enviamos para o Java passando o objeto de configuração 'auth'
+        await api.post('/usuarios', usuarioDTO, auth);
+
+        // Sucesso: volta para a home
+        res.redirect('/'); 
+
+    } catch (error) {
+        console.error("Erro ao criar usuário:", error.message);
+        
+        // Se o erro for 401, é porque a sessão expirou ou o usuário não é ADMIN
+        const mensagemErro = error.response?.status === 401 
+            ? "Sessão expirada ou você não tem permissão de Administrador." 
+            : "Erro ao criar usuário. Verifique se o login já existe.";
+
+        res.render('usuarios/novo', {
+            erro: mensagemErro,
+            paginaAtual: 'admin',
+            usuario: res.locals.usuario,
+            papel: res.locals.papel
+        });
+    }
 });
 
 module.exports = router;

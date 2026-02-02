@@ -5,35 +5,37 @@ const api = require('../services/api');
 // LISTAR CLIENTES
 router.get('/', async (req, res) => {
     try {
-        // Agora usamos apenas o objeto de autenticação centralizado
+        // Usamos a função centralizada que pega a authKey da sessão
         const auth = api.getAuth(req);
 
         const response = await api.get('/clientes', auth);
         const listaClientes = Array.isArray(response.data) ? response.data : [];
 
-        res.render('clientes/index', { 
+        res.render('clientes/index', {
             clientes: listaClientes,
             papel: req.session.usuarioLogado.papel,
-            usuario: req.session.usuarioLogado.nome, 
-            paginaAtual: 'clientes' 
+            usuario: req.session.usuarioLogado.nome,
+            paginaAtual: 'clientes'
         });
     } catch (error) {
         console.error("Erro ao listar clientes:", error.message);
-        res.render('clientes/index', { 
-            clientes: [], 
-            papel: req.session.usuarioLogado?.papel || 'USER', 
-            usuario: req.session.usuarioLogado?.nome || 'Erro', 
-            paginaAtual: 'clientes' 
+        res.render('clientes/index', {
+            clientes: [],
+            papel: req.session.usuarioLogado?.papel || 'USER',
+            usuario: req.session.usuarioLogado?.nome || 'Erro',
+            paginaAtual: 'clientes'
         });
     }
 });
 
-// FORMULÁRIO NOVO
+// FORMULÁRIO NOVO CLIENTE
 router.get('/novo', (req, res) => {
-    res.render('clientes/novo', { 
-        papel: req.session.usuarioLogado.papel, 
-        usuario: req.session.usuarioLogado.nome, 
-        paginaAtual: 'clientes' 
+    res.render('clientes/novo', {
+        papel: req.session.usuarioLogado.papel,
+        usuario: req.session.usuarioLogado.nome,
+        paginaAtual: 'clientes',
+        erro: null,
+        cliente: {} 
     });
 });
 
@@ -41,11 +43,30 @@ router.get('/novo', (req, res) => {
 router.post('/novo', async (req, res) => {
     try {
         const auth = api.getAuth(req);
-        await api.post('/clientes', req.body, auth);
+
+        const clienteDTO = {
+            nome: req.body.nome,
+            cpf: req.body.cpf,
+            email: req.body.email,
+            telefone: req.body.telefone,
+            endereco: req.body.endereco
+        };
+
+        await api.post('/clientes', clienteDTO, auth);
         res.redirect('/clientes');
     } catch (error) {
-        console.error("Erro ao salvar cliente:", error.message);
-        res.status(500).send("Erro ao salvar cliente.");
+        console.error("Erro ao salvar cliente:", error.response?.data || error.message);
+        
+        // Verifica se é erro de duplicação (CPF ou Email)
+        const msg = error.response?.status === 500 ? "Erro: CPF ou Email já cadastrado." : "Não foi possível salvar o cliente.";
+
+        res.render('clientes/novo', {
+            erro: msg,
+            papel: req.session.usuarioLogado.papel,
+            usuario: req.session.usuarioLogado.nome,
+            paginaAtual: 'clientes',
+            cliente: req.body
+        });
     }
 });
 
@@ -61,47 +82,20 @@ router.get('/:id/excluir', async (req, res) => {
     }
 });
 
-// FORMULÁRIO DE EDIÇÃO
-router.get('/:id/editar', async (req, res) => {
-    try {
-        const auth = api.getAuth(req);
-        const response = await api.get(`/clientes/${req.params.id}`, auth);
-        res.render('clientes/editar', { 
-            cliente: response.data,
-            papel: req.session.usuarioLogado.papel,
-            usuario: req.session.usuarioLogado.nome, 
-            paginaAtual: 'clientes' 
-        });
-    } catch (error) {
-        res.redirect('/clientes');
-    }
-});
-
-// PROCESSAR EDIÇÃO
-router.post('/:id/editar', async (req, res) => {
-    try {
-        const auth = api.getAuth(req);
-        await api.put(`/clientes/${req.params.id}`, req.body, auth);
-        res.redirect('/clientes');
-    } catch (error) {
-        res.status(500).send("Erro ao atualizar cliente.");
-    }
-});
-
-// BUSCA DINÂMICA
+// BUSCA DINÂMICA (Para o modal de Nova OS ou Barra de Pesquisa)
 router.get('/api/buscar', async (req, res) => {
     try {
         const auth = api.getAuth(req);
-        const query = req.query.q.toLowerCase();
-        const response = await api.get('/clientes', auth);
-        
-        const filtrados = response.data.filter(c => 
-            c.nome.toLowerCase().includes(query) || 
-            c.cpf.includes(query)
-        ).slice(0, 10);
-        
-        res.json(filtrados);
+        const query = req.query.q ? req.query.q.toLowerCase().trim() : '';
+
+        if (!query) return res.json([]);
+
+        // Busca no Spring Boot filtrando por nome
+        const response = await api.get(`/clientes/buscar?nome=${encodeURIComponent(query)}`, auth);
+
+        res.json(response.data.slice(0, 10));
     } catch (error) {
+        console.error("Erro na busca de clientes:", error.message);
         res.status(500).json([]);
     }
 });

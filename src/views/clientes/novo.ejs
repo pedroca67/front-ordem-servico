@@ -3,11 +3,18 @@
 <div class="box">
     <h1 class="title">Novo Cliente</h1>
 
+    <% if (erro) { %>
+      <div class="notification is-danger">
+        <%= erro %>
+      </div>
+    <% } %>
+
     <form action="/clientes/novo" method="POST">
         <div class="field">
             <label class="label">Nome</label>
             <div class="control">
-                <input class="input" type="text" name="nome" placeholder="Nome completo" required>
+                <input class="input" type="text" name="nome" placeholder="Nome completo" required
+                       value="<%= cliente.nome ? cliente.nome : '' %>">
             </div>
         </div>
 
@@ -16,7 +23,8 @@
                 <div class="field">
                     <label class="label">CPF (somente números)</label>
                     <div class="control">
-                        <input class="input" type="text" name="cpf" maxlength="11" required>
+                        <input class="input" type="text" name="cpf" maxlength="11" required
+                               value="<%= cliente.cpf ? cliente.cpf : '' %>">
                     </div>
                 </div>
             </div>
@@ -24,7 +32,8 @@
                 <div class="field">
                     <label class="label">Telefone</label>
                     <div class="control">
-                        <input class="input" type="text" name="telefone">
+                        <input class="input" type="text" name="telefone"
+                               value="<%= cliente.telefone ? cliente.telefone : '' %>">
                     </div>
                 </div>
             </div>
@@ -33,14 +42,16 @@
         <div class="field">
             <label class="label">E-mail</label>
             <div class="control">
-                <input class="input" type="email" name="email" required>
+                <input class="input" type="email" name="email" required
+                       value="<%= cliente.email ? cliente.email : '' %>">
             </div>
         </div>
 
         <div class="field">
             <label class="label">Endereço</label>
             <div class="control">
-                <input class="input" type="text" name="endereco" placeholder="Rua, número, bairro...">
+                <input class="input" type="text" name="endereco" placeholder="Rua, número, bairro..."
+                       value="<%= cliente.endereco ? cliente.endereco : '' %>">
             </div>
         </div>
 
