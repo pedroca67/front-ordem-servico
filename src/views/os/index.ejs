@@ -4,8 +4,19 @@
     <div class="level-left">
         <h1 class="title">Ordens de Serviço</h1>
     </div>
+    
     <div class="level-right">
         <div class="field is-grouped">
+            
+            <p class="control">
+                <a href="/os/nova" class="button is-primary">
+                    <span class="icon">
+                        <i class="fa fa-plus"></i>
+                    </span>
+                    <span>Nova OS</span>
+                </a>
+            </p>
+
             <p class="control">
                 <div class="select">
                     <select id="filtroStatus" onchange="filtrarTabela()">
@@ -26,13 +37,12 @@
                     </span>
                 </p>
                 <p class="control">
-                    <input class="input" type="text" id="filtroOS" onkeyup="filtrarTabela()" placeholder="Buscar por ID, Cliente ou CPF...">
+                    <input class="input" type="text" id="filtroOS" onkeyup="filtrarTabela()" placeholder="Buscar ID, Cliente ou CPF...">
                 </p>
             </div>
         </div>
     </div>
 </div>
-
 <div class="box">
     <table class="table is-fullwidth is-striped is-hoverable" id="tabela-os">
         <thead>

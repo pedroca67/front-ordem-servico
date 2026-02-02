@@ -5,23 +5,21 @@ const api = require('../services/api');
 // LISTAGEM DE OS
 router.get('/', async (req, res) => {
     try {
-        const { username, password } = req.session.usuarioLogado;
-        const auth = api.getAuthHeader(username, password);
-
+        const auth = api.getAuth(req);
         const response = await api.get('/ordens-servico', auth);
         
         res.render('os/index', { 
             ordens: response.data,
-            papel: req.session.usuarioLogado.dados.roles[0], 
-            usuario: req.session.usuarioLogado.dados.nome, 
+            papel: req.session.usuarioLogado.papel, 
+            usuario: req.session.usuarioLogado.nome, 
             paginaAtual: 'os' 
         });
     } catch (error) {
         console.error("Erro ao buscar OS:", error.message);
         res.render('os/index', { 
             ordens: [], 
-            papel: req.session.usuarioLogado ? req.session.usuarioLogado.dados.roles[0] : 'USER', 
-            usuario: req.session.usuarioLogado ? req.session.usuarioLogado.dados.nome : 'Erro', 
+            papel: req.session.usuarioLogado?.papel || 'USER', 
+            usuario: req.session.usuarioLogado?.nome || 'Erro', 
             paginaAtual: 'os' 
         });
     }
@@ -30,14 +28,13 @@ router.get('/', async (req, res) => {
 // TELA DE NOVA OS
 router.get('/nova', async (req, res) => {
     try {
-        const { username, password } = req.session.usuarioLogado;
-        const auth = api.getAuthHeader(username, password);
-
+        const auth = api.getAuth(req);
         const response = await api.get('/clientes', auth);
+        
         res.render('os/nova', { 
             clientes: response.data,
-            papel: req.session.usuarioLogado.dados.roles[0], 
-            usuario: req.session.usuarioLogado.dados.nome, 
+            papel: req.session.usuarioLogado.papel, 
+            usuario: req.session.usuarioLogado.nome, 
             paginaAtual: 'os' 
         });
     } catch (error) {
@@ -48,8 +45,7 @@ router.get('/nova', async (req, res) => {
 // PROCESSAR SALVAMENTO
 router.post('/nova', async (req, res) => {
     try {
-        const { username, password } = req.session.usuarioLogado;
-        const auth = api.getAuthHeader(username, password);
+        const auth = api.getAuth(req);
 
         const novaOS = {
             descricaoProblema: req.body.descricaoProblema,
@@ -70,15 +66,13 @@ router.post('/nova', async (req, res) => {
 // EXIBIR DETALHES DE UMA OS
 router.get('/:id', async (req, res) => {
     try {
-        const { username, password } = req.session.usuarioLogado;
-        const auth = api.getAuthHeader(username, password);
-
+        const auth = api.getAuth(req);
         const response = await api.get(`/ordens-servico/${req.params.id}`, auth);
         
         res.render('os/detalhes', { 
             ordem: response.data,
-            papel: req.session.usuarioLogado.dados.roles[0],
-            usuario: req.session.usuarioLogado.dados.nome,
+            papel: req.session.usuarioLogado.papel,
+            usuario: req.session.usuarioLogado.nome,
             paginaAtual: 'os'
         });
     } catch (error) {
@@ -89,14 +83,11 @@ router.get('/:id', async (req, res) => {
 // ATUALIZAR STATUS DA OS
 router.post('/:id/status', async (req, res) => {
     try {
-        const { username, password } = req.session.usuarioLogado;
-        const auth = api.getAuthHeader(username, password);
-
+        const auth = api.getAuth(req);
         const { id } = req.params;
         const { status } = req.body;
         
         await api.put(`/ordens-servico/${id}/status`, { status }, auth);
-        
         res.redirect(`/os/${id}`);
     } catch (error) {
         res.redirect(`/os/${req.params.id}`);
@@ -106,9 +97,7 @@ router.post('/:id/status', async (req, res) => {
 // EXCLUIR OS
 router.post('/:id/excluir', async (req, res) => {
     try {
-        const { username, password } = req.session.usuarioLogado;
-        const auth = api.getAuthHeader(username, password);
-
+        const auth = api.getAuth(req);
         await api.delete(`/ordens-servico/${req.params.id}`, auth);
         res.redirect('/os');
     } catch (error) {
@@ -119,9 +108,7 @@ router.post('/:id/excluir', async (req, res) => {
 // EXIBIR FORMULÁRIO DE EDIÇÃO
 router.get('/:id/editar', async (req, res) => {
     try {
-        const { username, password } = req.session.usuarioLogado;
-        const auth = api.getAuthHeader(username, password);
-
+        const auth = api.getAuth(req);
         const response = await api.get(`/ordens-servico/${req.params.id}`, auth);
         const ordem = response.data;
 
@@ -131,8 +118,8 @@ router.get('/:id/editar', async (req, res) => {
 
         res.render('os/editar', { 
             ordem,
-            papel: req.session.usuarioLogado.dados.roles[0],
-            usuario: req.session.usuarioLogado.dados.nome,
+            papel: req.session.usuarioLogado.papel,
+            usuario: req.session.usuarioLogado.nome,
             paginaAtual: 'os'
         });
     } catch (error) {
@@ -143,8 +130,7 @@ router.get('/:id/editar', async (req, res) => {
 // PROCESSAR EDIÇÃO
 router.post('/:id/editar', async (req, res) => {
     try {
-        const { username, password } = req.session.usuarioLogado;
-        const auth = api.getAuthHeader(username, password);
+        const auth = api.getAuth(req);
 
         const dadosParaEnviar = {
             descricaoProblema: req.body.descricaoProblema,

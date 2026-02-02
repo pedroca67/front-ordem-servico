@@ -8,9 +8,8 @@ router.get('/', async (req, res) => {
 
     if (dataInicio && dataFim) {
         try {
-            // 1. Pegar credenciais da sessão para o Java autorizar
-            const { username, password } = req.session.usuarioLogado;
-            const auth = api.getAuthHeader(username, password);
+            // 1. Usamos a função centralizada para pegar a autorização (authKey)
+            const auth = api.getAuth(req);
 
             // 2. Formatar datas para o padrão do Java: yyyy-MM-dd HH:mm:ss
             const inicio = `${dataInicio} 00:00:00`;
@@ -25,16 +24,19 @@ router.get('/', async (req, res) => {
             dadosRelatorio.total = resTotal.data;
             dadosRelatorio.ordens = resOrdens.data;
 
-            console.log("Dados recebidos do Java:", dadosRelatorio); // Para você conferir no terminal
+            console.log("Relatório gerado com sucesso para o período:", dataInicio, "a", dataFim);
 
         } catch (error) {
             console.error("Erro ao buscar relatório:", error.response ? error.response.data : error.message);
         }
     }
 
+    // 4. Renderizamos passando os dados simplificados da sessão (nome e papel)
     res.render('relatorios/index', { 
         dados: dadosRelatorio,
         filtros: { dataInicio, dataFim },
+        usuario: req.session.usuarioLogado?.nome,
+        papel: req.session.usuarioLogado?.papel,
         paginaAtual: 'relatorios'
     });
 });

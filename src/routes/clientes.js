@@ -5,27 +5,24 @@ const api = require('../services/api');
 // LISTAR CLIENTES
 router.get('/', async (req, res) => {
     try {
-        // 1. Pegar credenciais da sessão
-        const { username, password } = req.session.usuarioLogado;
-        const auth = api.getAuthHeader(username, password);
+        // Agora usamos apenas o objeto de autenticação centralizado
+        const auth = api.getAuth(req);
 
-        // 2. Enviar o auth no pedido para o Java
         const response = await api.get('/clientes', auth);
-        
         const listaClientes = Array.isArray(response.data) ? response.data : [];
 
         res.render('clientes/index', { 
             clientes: listaClientes,
-            papel: req.session.usuarioLogado.dados.roles[0],
-            usuario: req.session.usuarioLogado.dados.nome, 
+            papel: req.session.usuarioLogado.papel,
+            usuario: req.session.usuarioLogado.nome, 
             paginaAtual: 'clientes' 
         });
     } catch (error) {
         console.error("Erro ao listar clientes:", error.message);
         res.render('clientes/index', { 
             clientes: [], 
-            papel: req.session.usuarioLogado ? req.session.usuarioLogado.dados.roles[0] : 'USER', 
-            usuario: req.session.usuarioLogado ? req.session.usuarioLogado.dados.nome : 'Erro', 
+            papel: req.session.usuarioLogado?.papel || 'USER', 
+            usuario: req.session.usuarioLogado?.nome || 'Erro', 
             paginaAtual: 'clientes' 
         });
     }
@@ -34,8 +31,8 @@ router.get('/', async (req, res) => {
 // FORMULÁRIO NOVO
 router.get('/novo', (req, res) => {
     res.render('clientes/novo', { 
-        papel: req.session.usuarioLogado.dados.roles[0], 
-        usuario: req.session.usuarioLogado.dados.nome, 
+        papel: req.session.usuarioLogado.papel, 
+        usuario: req.session.usuarioLogado.nome, 
         paginaAtual: 'clientes' 
     });
 });
@@ -43,9 +40,7 @@ router.get('/novo', (req, res) => {
 // PROCESSAR CADASTRO
 router.post('/novo', async (req, res) => {
     try {
-        const { username, password } = req.session.usuarioLogado;
-        const auth = api.getAuthHeader(username, password);
-
+        const auth = api.getAuth(req);
         await api.post('/clientes', req.body, auth);
         res.redirect('/clientes');
     } catch (error) {
@@ -57,9 +52,7 @@ router.post('/novo', async (req, res) => {
 // EXCLUIR CLIENTE
 router.get('/:id/excluir', async (req, res) => {
     try {
-        const { username, password } = req.session.usuarioLogado;
-        const auth = api.getAuthHeader(username, password);
-
+        const auth = api.getAuth(req);
         await api.delete(`/clientes/${req.params.id}`, auth);
         res.redirect('/clientes');
     } catch (error) {
@@ -71,14 +64,12 @@ router.get('/:id/excluir', async (req, res) => {
 // FORMULÁRIO DE EDIÇÃO
 router.get('/:id/editar', async (req, res) => {
     try {
-        const { username, password } = req.session.usuarioLogado;
-        const auth = api.getAuthHeader(username, password);
-
+        const auth = api.getAuth(req);
         const response = await api.get(`/clientes/${req.params.id}`, auth);
         res.render('clientes/editar', { 
             cliente: response.data,
-            papel: req.session.usuarioLogado.dados.roles[0],
-            usuario: req.session.usuarioLogado.dados.nome, 
+            papel: req.session.usuarioLogado.papel,
+            usuario: req.session.usuarioLogado.nome, 
             paginaAtual: 'clientes' 
         });
     } catch (error) {
@@ -89,9 +80,7 @@ router.get('/:id/editar', async (req, res) => {
 // PROCESSAR EDIÇÃO
 router.post('/:id/editar', async (req, res) => {
     try {
-        const { username, password } = req.session.usuarioLogado;
-        const auth = api.getAuthHeader(username, password);
-
+        const auth = api.getAuth(req);
         await api.put(`/clientes/${req.params.id}`, req.body, auth);
         res.redirect('/clientes');
     } catch (error) {
@@ -99,12 +88,10 @@ router.post('/:id/editar', async (req, res) => {
     }
 });
 
-// BUSCA DINÂMICA (Utilizada em modais de OS)
+// BUSCA DINÂMICA
 router.get('/api/buscar', async (req, res) => {
     try {
-        const { username, password } = req.session.usuarioLogado;
-        const auth = api.getAuthHeader(username, password);
-        
+        const auth = api.getAuth(req);
         const query = req.query.q.toLowerCase();
         const response = await api.get('/clientes', auth);
         

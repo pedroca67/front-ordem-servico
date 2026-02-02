@@ -10,20 +10,32 @@ router.post('/login', async (req, res) => {
     const { username, password } = req.body;
 
     try {
-        // Tentamos buscar os dados do próprio usuário para validar a senha no Java
-        // Passamos o header de auth dinamicamente
-        const response = await api.get('/usuarios', api.getAuthHeader(username, password));
-        
-        // Se chegou aqui, a senha está correta! Salvamos na sessão do Node
+        // 1. Geramos a chave Base64 temporária para validar o login no Java
+        const authKey = Buffer.from(`${username}:${password}`).toString('base64');
+        const auth = { headers: { 'Authorization': `Basic ${authKey}` } };
+
+        // 2. Buscamos a lista de usuários para encontrar os dados de quem está logando
+        const response = await api.get('/usuarios', auth);
+        const usuarioEncontrado = response.data.find(u => u.username === username);
+
+        if (!usuarioEncontrado) {
+            throw new Error("Usuário não encontrado na base de dados.");
+        }
+
+        // 3. SEGURANÇA: Salvamos a chave e os dados, mas NUNCA a senha em texto puro
+        req.session.authKey = authKey;
         req.session.usuarioLogado = {
-            username: username,
-            password: password,
-            // Aqui você pode filtrar o papel (ADMIN/USER) vindo do Java
-            dados: response.data.find(u => u.username === username)
+            nome: usuarioEncontrado.nome,
+            papel: usuarioEncontrado.role || (usuarioEncontrado.roles ? usuarioEncontrado.roles[0] : 'USER')
         };
 
-        res.redirect('/');
+        // Salva a sessão manualmente antes de redirecionar para evitar bugs de sincronia
+        req.session.save(() => {
+            res.redirect('/');
+        });
+
     } catch (error) {
+        console.error("Erro no login:", error.message);
         res.render('auth/login', { erro: "Usuário ou senha inválidos" });
     }
 });
