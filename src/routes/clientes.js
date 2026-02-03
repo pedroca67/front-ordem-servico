@@ -122,5 +122,23 @@ router.post('/:id/editar', async (req, res) => {
         });
     }
 });
+// Adicione esta rota ao seu arquivo para testar a busca
+router.get('/api/buscar', async (req, res) => {
+    try {
+        const auth = api.getAuth(req);
+        const termo = req.query.q || '';
+        
+        // Chamada para o Java (Spring Boot)
+        // O Java espera /api/clientes/buscar?nome=...
+        const response = await api.get(`/clientes/buscar?nome=${encodeURIComponent(termo)}`, auth);
+        
+        res.json(response.data);
+    } catch (error) {
+        console.error("Erro na API Java:", error.response?.data || error.message);
+        res.status(500).json([]);
+    }
+});
+
+module.exports = router;
 
 module.exports = router;

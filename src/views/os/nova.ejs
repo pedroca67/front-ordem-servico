@@ -82,34 +82,69 @@
 
 <script>
     async function buscarClientes() {
-        const query = document.getElementById('input-busca').value;
-        if (query.length < 2) return;
-
-        const res = await fetch(`/clientes/api/buscar?q=${query}`);
-        const clientes = await res.json();
-        
+        const input = document.getElementById('input-busca');
+        const query = input.value.trim();
         const container = document.getElementById('resultado-busca');
-        container.innerHTML = '';
+        
+        if (query.length < 2) {
+            alert("Digite pelo menos 2 caracteres para buscar.");
+            return;
+        }
 
-        clientes.forEach(c => {
-            const item = document.createElement('div');
-            item.className = 'box mb-2 p-2 is-clickable has-background-white-ter';
-            item.innerHTML = `<strong>${c.nome}</strong> <small>(CPF: ${c.cpf})</small> <button type="button" class="button is-small is-primary is-pulled-right">Selecionar</button>`;
-            item.onclick = () => {
-                document.getElementById('cliente-id-input').value = c.id;
-                document.getElementById('nome-selecionado').innerText = c.nome + " (CPF: " + c.cpf + ")";
-                document.getElementById('form-completo').style.display = 'block';
-                document.getElementById('secao-busca').style.display = 'none';
-                container.innerHTML = '';
-            };
-            container.appendChild(item);
-        });
+        container.innerHTML = '<p class="has-text-centered">Buscando...</p>';
+
+        try {
+            // Chamada para a rota que criamos no Node
+            const res = await fetch(`/clientes/api/buscar?q=${encodeURIComponent(query)}`);
+            
+            if (!res.ok) throw new Error("Erro na rede ou servidor");
+
+            const clientes = await res.json();
+            console.log("Clientes encontrados:", clientes); // Verifique o F12 aqui!
+
+            container.innerHTML = '';
+
+            if (clientes.length === 0) {
+                container.innerHTML = '<div class="notification is-warning">Nenhum cliente encontrado com esse nome.</div>';
+                return;
+            }
+
+            clientes.forEach(c => {
+                const item = document.createElement('div');
+                item.className = 'box mb-2 p-2 is-clickable has-background-white-ter';
+                item.style.border = "1px solid #dbdbdb";
+                
+                item.innerHTML = `
+                    <div class="is-flex is-justify-content-space-between is-align-items-center">
+                        <div>
+                            <strong>${c.nome}</strong> <br>
+                            <small class="has-text-grey">CPF: ${c.cpf || 'Não informado'}</small>
+                        </div>
+                        <button type="button" class="button is-small is-primary">Selecionar</button>
+                    </div>
+                `;
+
+                item.onclick = () => {
+                    document.getElementById('cliente-id-input').value = c.id;
+                    document.getElementById('nome-selecionado').innerText = `${c.nome} (CPF: ${c.cpf || '---'})`;
+                    document.getElementById('form-completo').style.display = 'block';
+                    document.getElementById('secao-busca').style.display = 'none';
+                    container.innerHTML = '';
+                };
+                container.appendChild(item);
+            });
+
+        } catch (err) {
+            console.error("Erro no fetch:", err);
+            container.innerHTML = '<div class="notification is-danger">Erro ao buscar clientes. Verifique o console.</div>';
+        }
     }
 
     function resetarBusca() {
         document.getElementById('form-completo').style.display = 'none';
         document.getElementById('secao-busca').style.display = 'block';
         document.getElementById('input-busca').value = '';
+        document.getElementById('resultado-busca').innerHTML = '';
     }
 </script>
 
