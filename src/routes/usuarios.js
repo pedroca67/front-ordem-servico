@@ -2,61 +2,39 @@ const express = require('express');
 const router = express.Router();
 const api = require('../services/api');
 
-// Exibe o formulário de cadastro
-router.get('/novo', (req, res) => {
+// Middleware para simplificar a renderização
+const renderNovo = (req, res, dados = {}) => {
     res.render('usuarios/novo', {
         paginaAtual: 'admin',
-        erro: null,
-        errosCampos: {},
-        dadosForm: {},
+        erro: dados.erro || null,
+        errosCampos: dados.errosCampos || {},
+        dadosForm: dados.dadosForm || {},
         usuario: res.locals.usuario,
         papel: res.locals.papel
     });
-});
+};
 
-// PROCESSAR O CADASTRO
+router.get('/novo', (req, res) => renderNovo(req, res));
+
 router.post('/salvar', async (req, res) => {
     try {
-        const auth = api.getAuth(req);
+        const { username, password, papel } = req.body;
+        
+        await api.post('/usuarios', { 
+            nome: username, 
+            username, 
+            senha: password, 
+            role: papel 
+        }, api.getAuth(req));
 
-        const novoUsuario = {
-            nome: req.body.username,
-            username: req.body.username,
-            senha: req.body.password,
-            role: req.body.papel
-        };
-
-        await api.post('/usuarios', novoUsuario, auth);
-
-        // Sucesso
-        return res.redirect('/');
-
+        res.redirect('/');
     } catch (error) {
-        console.error("Erro ao criar usuário:", error.response?.data || error.message);
-
         const apiErro = error.response?.data;
-        let msgErro = "Verifique os dados informados abaixo.";
-        let errosCampos = {};
-
-        if (apiErro) {
-            // PRIORIDADE 1: mensagem direta do backend (ex: 409 usuário já existe)
-            if (apiErro.message) {
-                msgErro = apiErro.message;
-            }
-
-            // PRIORIDADE 2: erros de validação (400)
-            if (apiErro.errors) {
-                errosCampos = apiErro.errors;
-            }
-        }
-
-        return res.render('usuarios/novo', {
-            erro: msgErro,
-            errosCampos: errosCampos,
-            paginaAtual: 'admin',
-            dadosForm: req.body,
-            usuario: res.locals.usuario,
-            papel: res.locals.papel
+        
+        renderNovo(req, res, {
+            erro: apiErro?.message || "Erro ao processar cadastro",
+            errosCampos: apiErro?.errors || {},
+            dadosForm: req.body
         });
     }
 });
