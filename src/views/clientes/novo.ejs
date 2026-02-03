@@ -38,7 +38,7 @@
                                 <div class="control">
                                     <input
                                         class="input <%= locals.errosCampos && errosCampos.telefone ? 'is-danger' : '' %>"
-                                        type="text" name="telefone" value="<%= cliente.telefone || '' %>">
+                                        type="text" name="telefone" value="<%= cliente.telefone || '' %>" maxlength="11">
                                 </div>
 
                                 <% if (locals.errosCampos && errosCampos.telefone) { %>

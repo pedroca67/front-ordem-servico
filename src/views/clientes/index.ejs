@@ -50,12 +50,31 @@
                     <td><%= c.telefone %></td>
                     <td class="has-text-centered">
                         <a href="/clientes/<%= c.id %>/editar" class="button is-small is-info is-light">Editar</a>
-                        <a href="/clientes/<%= c.id %>/excluir" class="button is-small is-danger is-light" onclick="return confirm('Excluir este cliente?')">Excluir</a>
+                        <a href="#" class="button is-small is-danger is-light" 
+                           onclick="abrirModal('<%= c.id %>')">Excluir</a>
                     </td>
                 </tr>
             <% }) %>
         </tbody>
     </table>
+</div>
+
+<!-- Modal de confirmação -->
+<div id="modal-excluir" class="modal">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">Confirmar Exclusão</p>
+      <button class="delete" aria-label="close" onclick="fecharModal()"></button>
+    </header>
+    <section class="modal-card-body">
+      Tem certeza que deseja excluir este cliente?
+    </section>
+    <footer class="modal-card-foot">
+      <button class="button is-danger" id="confirmarExcluir">Sim, excluir</button>
+      <button class="button" onclick="fecharModal()">Cancelar</button>
+    </footer>
+  </div>
 </div>
 
 <script>
@@ -82,6 +101,25 @@ function filtrarClientes() {
         }
     }
 }
+
+// ---------------------- Modal ----------------------
+let clienteParaExcluir = null;
+
+function abrirModal(clienteId) {
+    clienteParaExcluir = clienteId;
+    document.getElementById("modal-excluir").classList.add("is-active");
+}
+
+function fecharModal() {
+    document.getElementById("modal-excluir").classList.remove("is-active");
+    clienteParaExcluir = null;
+}
+
+document.getElementById("confirmarExcluir").addEventListener("click", function() {
+    if (clienteParaExcluir) {
+        window.location.href = `/clientes/${clienteParaExcluir}/excluir`;
+    }
+});
 </script>
 
 <%- include("../partials/footer") %>
