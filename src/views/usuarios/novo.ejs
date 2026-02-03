@@ -1,4 +1,5 @@
 <%- include('../partials/header') %>
+
 <div class="columns is-centered mt-4">
     <div class="column is-6-tablet is-5-desktop">
 
@@ -11,36 +12,70 @@
             </header>
 
             <div class="card-content">
+
+                <% if (locals.erro) { %>
+                    <div class="notification is-danger is-light">
+                        <button class="delete"></button>
+                        <i class="fa-solid fa-triangle-exclamation mr-2"></i>
+                        <%= erro %>
+                    </div>
+                <% } %>
+
                 <form action="/usuarios/salvar" method="POST">
 
                     <div class="field">
                         <label class="label">Nome de Usuário</label>
                         <div class="control has-icons-left">
-                            <input class="input" type="text" name="username" placeholder="Ex: joao.silva" required>
+                            <input class="input <%= (locals.errosCampos && errosCampos.username) ? 'is-danger' : '' %>"
+                                   type="text"
+                                   name="username"
+                                   placeholder="user"
+                                   value="<%= locals.dadosForm ? dadosForm.username : '' %>"
+                                   required>
                             <span class="icon is-small is-left"><i class="fa-solid fa-user"></i></span>
                         </div>
+
+                        <% if (locals.errosCampos && errosCampos.username) { %>
+                            <p class="help is-danger"><%= errosCampos.username %></p>
+                        <% } %>
                     </div>
 
                     <div class="field">
                         <label class="label">Senha</label>
                         <div class="control has-icons-left">
-                            <input class="input" type="password" name="password" placeholder="******" required>
+                            <input class="input <%= (locals.errosCampos && (errosCampos.senha || errosCampos.password)) ? 'is-danger' : '' %>"
+                                   type="password"
+                                   name="password"
+                                   placeholder="******"
+                                   required>
                             <span class="icon is-small is-left"><i class="fa-solid fa-lock"></i></span>
                         </div>
+
+                        <% if (locals.errosCampos && (errosCampos.senha || errosCampos.password)) { %>
+                            <p class="help is-danger"><%= errosCampos.senha || errosCampos.password %></p>
+                        <% } %>
                     </div>
 
                     <div class="field">
                         <label class="label">Nível de Acesso</label>
                         <div class="control has-icons-left">
-                            <div class="select is-fullwidth">
+                            <div class="select is-fullwidth <%= (locals.errosCampos && (errosCampos.role || errosCampos.papel)) ? 'is-danger' : '' %>">
                                 <select name="papel" required>
-                                    <option value="" disabled selected>Selecione o nível...</option>
-                                    <option value="FUNCIONARIO">Funcionário (Acesso Padrão)</option>
-                                    <option value="ADMIN">Administrador (Acesso Total)</option>
+                                    <option value="" disabled selected>Selecione o nível</option>
+                                    <option value="FUNCIONARIO" <%= locals.dadosForm && dadosForm.papel === 'FUNCIONARIO' ? 'selected' : '' %>>
+                                        Funcionário (Acesso Padrão)
+                                    </option>
+                                    <option value="ADMIN" <%= locals.dadosForm && dadosForm.papel === 'ADMIN' ? 'selected' : '' %>>
+                                        Administrador (Acesso Total)
+                                    </option>
                                 </select>
                             </div>
                             <span class="icon is-small is-left"><i class="fa-solid fa-id-badge"></i></span>
                         </div>
+
+                        <% if (locals.errosCampos && (errosCampos.role || errosCampos.papel)) { %>
+                            <p class="help is-danger"><%= errosCampos.role || errosCampos.papel %></p>
+                        <% } %>
                     </div>
 
                     <hr>
@@ -51,6 +86,7 @@
                                 Criar Usuário
                             </button>
                         </div>
+
                         <div class="control">
                             <a href="/" class="button is-light is-medium">
                                 Cancelar
@@ -61,7 +97,7 @@
                 </form>
             </div>
         </div>
-        
+
         <p class="has-text-centered mt-4 is-size-7 has-text-grey">
             Usuários novos já podem logar imediatamente.
         </p>

@@ -1,69 +1,88 @@
 <%- include("../partials/header") %>
 
-<div class="box">
-    <h1 class="title">Novo Cliente</h1>
+    <div class="box">
+        <h1 class="title">
+            <%= locals.editando ? 'Editar Cliente' : 'Novo Cliente' %>
+        </h1>
 
-    <% if (erro) { %>
-      <div class="notification is-danger">
-        <%= erro %>
-      </div>
-    <% } %>
-
-    <form action="/clientes/novo" method="POST">
-        <div class="field">
-            <label class="label">Nome</label>
-            <div class="control">
-                <input class="input" type="text" name="nome" placeholder="Nome completo" required
-                       value="<%= cliente.nome ? cliente.nome : '' %>">
+        <% if (erro) { %>
+            <div class="notification is-danger">
+                <%= erro %>
             </div>
-        </div>
+            <% } %>
 
-        <div class="columns">
-            <div class="column">
-                <div class="field">
-                    <label class="label">CPF (somente números)</label>
-                    <div class="control">
-                        <input class="input" type="text" name="cpf" maxlength="11" required
-                               value="<%= cliente.cpf ? cliente.cpf : '' %>">
+                <form action="<%= locals.editando ? '/clientes/' + cliente.id + '/editar' : '/clientes/novo' %>"
+                    method="POST">
+
+                    <div class="field">
+                        <label class="label">Nome</label>
+                        <div class="control">
+                            <input class="input" type="text" name="nome" placeholder="Nome completo" required
+                                value="<%= cliente.nome || '' %>">
+                        </div>
                     </div>
-                </div>
-            </div>
-            <div class="column">
-                <div class="field">
-                    <label class="label">Telefone</label>
-                    <div class="control">
-                        <input class="input" type="text" name="telefone"
-                               value="<%= cliente.telefone ? cliente.telefone : '' %>">
+
+                    <div class="columns">
+                        <div class="column">
+                            <div class="field">
+                                <label class="label">CPF (somente números)</label>
+                                <div class="control">
+                                    <input class="input" type="text" name="cpf" maxlength="11" required
+                                        value="<%= cliente.cpf || '' %>" <%=locals.editando ? 'readonly' : '' %>>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="column">
+                            <div class="field">
+                                <label class="label">Telefone</label>
+                                <div class="control">
+                                    <input
+                                        class="input <%= locals.errosCampos && errosCampos.telefone ? 'is-danger' : '' %>"
+                                        type="text" name="telefone" value="<%= cliente.telefone || '' %>">
+                                </div>
+
+                                <% if (locals.errosCampos && errosCampos.telefone) { %>
+                                    <p class="help is-danger">
+                                        <%= errosCampos.telefone %>
+                                    </p>
+                                    <% } %>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
-        </div>
 
-        <div class="field">
-            <label class="label">E-mail</label>
-            <div class="control">
-                <input class="input" type="email" name="email" required
-                       value="<%= cliente.email ? cliente.email : '' %>">
-            </div>
-        </div>
+                    <div class="field">
+                        <label class="label">E-mail</label>
+                        <div class="control">
+                            <input class="input" type="email" name="email" required value="<%= cliente.email || '' %>">
+                        </div>
+                    </div>
 
-        <div class="field">
-            <label class="label">Endereço</label>
-            <div class="control">
-                <input class="input" type="text" name="endereco" placeholder="Rua, número, bairro..."
-                       value="<%= cliente.endereco ? cliente.endereco : '' %>">
-            </div>
-        </div>
+                    <div class="field">
+                        <label class="label">Endereço</label>
+                        <div class="control">
+                            <input class="input" type="text" name="endereco" placeholder="Rua, número, bairro..."
+                                value="<%= cliente.endereco || '' %>">
+                        </div>
+                    </div>
 
-        <div class="field is-grouped">
-            <div class="control">
-                <button class="button is-primary" type="submit">Salvar Cliente</button>
-            </div>
-            <div class="control">
-                <a href="/clientes" class="button is-light">Cancelar</a>
-            </div>
-        </div>
-    </form>
-</div>
+                    <div class="field is-grouped">
+                        <div class="control">
+                            <button class="button is-primary" type="submit">
+                                <%= locals.editando ? 'Salvar Alterações' : 'Salvar Cliente' %>
+                            </button>
+                        </div>
+                        <div class="control">
+                            <a href="/clientes" class="button is-light">Cancelar</a>
+                        </div>
+                    </div>
+                </form>
+    </div>
 
-<%- include("../partials/footer") %>
+    <script>
+        document.querySelector('form').onsubmit = function () {
+            const tel = document.querySelector('input[name="telefone"]');
+            if (tel) tel.value = tel.value.replace(/\D/g, '');
+        };
+    </script>
+
+    <%- include("../partials/footer") %>
