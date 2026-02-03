@@ -4,20 +4,23 @@ const api = require('../services/api');
 
 const auth = req => api.getAuth(req);
 
+// Helper para enviar dados padrão pra views
 const viewData = (req, extra = {}) => ({
-    papel: req.session.usuarioLogado?.papel || 'USER',
-    usuario: req.session.usuarioLogado?.nome || '',
-    paginaAtual: 'os',
-    ...extra
+    papel: req.session.usuarioLogado?.papel || 'USER', // Papel do usuário
+    usuario: req.session.usuarioLogado?.nome || '',    // Nome do usuário
+    paginaAtual: 'os',                                  // Página atual (menu ativo)
+    ...extra                                            // Junta dados extras específicos da rota
 });
 
 // LISTAGEM
 router.get('/', async (req, res) => {
     try {
-        const { data = [] } = await api.get('/ordens-servico', auth(req));
-        res.render('os/index', viewData(req, { ordens: data }));
+        const { data = [] } = await api.get('/ordens-servico', auth(req)); // Busca todas as OS do backend
+
+        res.render('os/index', viewData(req, { ordens: data })); // Renderiza página com lista de ordens
+
     } catch {
-        res.render('os/index', viewData(req, { ordens: [] }));
+        res.render('os/index', viewData(req, { ordens: [] })); // Se der erro, renderiza lista vazia
     }
 });
 
@@ -25,9 +28,9 @@ router.get('/', async (req, res) => {
 router.get('/nova', async (req, res) => {
     try {
         const { data } = await api.get('/clientes', auth(req));
-        res.render('os/nova', viewData(req, { clientes: data }));
+        res.render('os/nova', viewData(req, { clientes: data })); //busca clientes para popular o select (VAMOS MUDAR ISSO)
     } catch {
-        res.redirect('/os');
+        res.redirect('/os'); //
     }
 });
 
@@ -39,7 +42,8 @@ router.post('/nova', async (req, res) => {
             observacoes: req.body.observacoes || '',
             valor: req.body.valorOrcamento,
             status: req.body.status || 'ABERTA',
-            clienteId: req.body.clienteId
+            clienteId: req.body.clienteId,
+            aparelho: req.body.aparelho
         }, auth(req));
 
         res.redirect('/os');
@@ -51,10 +55,10 @@ router.post('/nova', async (req, res) => {
 // DETALHES
 router.get('/:id', async (req, res) => {
     try {
-        const { data } = await api.get(`/ordens-servico/${req.params.id}`, auth(req));
-        res.render('os/detalhes', viewData(req, { ordem: data }));
+        const { data } = await api.get(`/ordens-servico/${req.params.id}`, auth(req)); // Busca OS específica pelo ID
+        res.render('os/detalhes', viewData(req, { ordem: data }));  // Renderiza página de detalhes
     } catch {
-        res.redirect('/os');
+        res.redirect('/os'); // Se não encontrar, volta pra lista
     }
 });
 
@@ -65,16 +69,18 @@ router.post('/:id/status', async (req, res) => {
             { status: req.body.status },
             auth(req)
         );
+        // Atualiza status da OS
 
     } finally {
         res.redirect(`/os/${req.params.id}`);
+        // Sempre volta pra página de detalhes
     }
 });
 
 // EXCLUIR
 router.post('/:id/excluir', async (req, res) => {
     try {
-        await api.delete(`/ordens-servico/${req.params.id}`, auth(req));
+        await api.delete(`/ordens-servico/${req.params.id}`, auth(req)); // Exclui OS no backend
         res.redirect('/os');
     } catch {
         res.status(500).send('Erro ao excluir a ordem.');
@@ -84,11 +90,11 @@ router.post('/:id/excluir', async (req, res) => {
 // EDITAR (FORM)
 router.get('/:id/editar', async (req, res) => {
     try {
-        const { data: ordem } = await api.get(`/ordens-servico/${req.params.id}`, auth(req));
+        const { data: ordem } = await api.get(`/ordens-servico/${req.params.id}`, auth(req)); // Busca OS específica
 
-        if (ordem.status === 'CONCLUIDA') return res.redirect(`/os/${ordem.id}`);
+        if (ordem.status === 'CONCLUIDA') return res.redirect(`/os/${ordem.id}`); // Se já concluída, não permite editar
 
-        res.render('os/editar', viewData(req, { ordem }));
+        res.render('os/editar', viewData(req, { ordem })); //renderiza formulário de edição
     } catch {
         res.redirect('/os');
     }
@@ -102,8 +108,9 @@ router.post('/:id/editar', async (req, res) => {
             observacoes: req.body.observacoes,
             valor: Number(req.body.valor),
             status: req.body.status,
-            clienteId: Number(req.body.clienteId)
-        }, auth(req));
+            clienteId: Number(req.body.clienteId),
+            aparelho: req.body.aparelho
+        }, auth(req)); // Salva alterações no backend
 
         res.redirect(`/os/${req.params.id}`);
     } catch {

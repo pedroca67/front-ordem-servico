@@ -17,11 +17,12 @@ const renderNovo = (res, extra = {}) => {
     });
 };
 
-router.get('/novo', (_, res) => renderNovo(res));
+router.get('/novo', (_, res) => renderNovo(res)); // Apenas renderiza o formulário vazio
 
 router.post('/salvar', async (req, res) => {
     try {
         const { username, password, papel } = req.body;
+        // Pega dados do formulário
 
         await api.post('/usuarios', {
             nome: username,
@@ -29,18 +30,25 @@ router.post('/salvar', async (req, res) => {
             senha: password,
             role: papel
         }, auth(req));
+        // Chama o backend para criar o usuário
 
         res.redirect('/');
+        // Se sucesso, volta pra home
 
     } catch (err) {
         const apiErro = err.response?.data;
+        // Captura mensagem de erro retornada pelo backend
 
         renderNovo(res, {
             erro: apiErro?.message || 'Erro ao processar cadastro',
-            errosCampos: apiErro?.errors || {},
-            dadosForm: req.body
+            errosCampos: apiErro?.errors || {}, // Erros específicos de campos (ex: senha fraca)
+            dadosForm: req.body                  // Mantém dados preenchidos pelo usuário
         });
+        // Re-renderiza o formulário com mensagens de erro
     }
 });
+
+
+module.exports = router;
 
 module.exports = router;

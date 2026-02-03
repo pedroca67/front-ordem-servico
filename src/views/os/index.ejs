@@ -37,18 +37,20 @@
                     </span>
                 </p>
                 <p class="control">
-                    <input class="input" type="text" id="filtroOS" onkeyup="filtrarTabela()" placeholder="Buscar ID, Cliente ou CPF...">
+                    <input class="input" type="text" id="filtroOS" onkeyup="filtrarTabela()" placeholder="Buscar ID, Cliente, CPF ou Aparelho...">
                 </p>
             </div>
         </div>
     </div>
 </div>
+
 <div class="box">
     <table class="table is-fullwidth is-striped is-hoverable" id="tabela-os">
         <thead>
             <tr>
                 <th>ID</th>
                 <th>Cliente</th>
+                <th>Aparelho</th> <!-- Nova coluna -->
                 <th>Valor</th>
                 <th>Status</th>
                 <th>Data Abertura</th>
@@ -57,6 +59,14 @@
         </thead>
         <tbody>
             <% ordens.forEach(o => { %>
+                <% 
+                    // Define a cor da tag com var para EJS
+                    var corTag = 'is-warning'; // padrão EM_ANDAMENTO
+                    if (o.status === 'CONCLUIDA') corTag = 'is-success';
+                    if (o.status === 'CANCELADA') corTag = 'is-danger';
+                    if (o.status === 'ABERTA') corTag = 'is-info';
+                    if (o.status === 'AGUARDANDO_PECAS') corTag = 'is-dark';
+                %>
                 <tr>
                     <td><strong>#<%= o.id %></strong></td>
                     <td>
@@ -65,15 +75,9 @@
                             <span style="display:none"><%= o.cliente.cpf %></span>
                         <% } %>
                     </td>
+                    <td><%= o.aparelho || 'N/A' %></td> <!-- Coluna Aparelho -->
                     <td><strong>R$ <%= o.valor %></strong></td>
                     <td>
-                        <% 
-                            let corTag = 'is-warning'; // Amarelo (Padrão para EM_ANDAMENTO)
-                            if (o.status === 'CONCLUIDA') corTag = 'is-success'; // Verde
-                            if (o.status === 'CANCELADA') corTag = 'is-danger';  // Vermelho
-                            if (o.status === 'ABERTA') corTag = 'is-info';      // Azul
-                            if (o.status === 'AGUARDANDO_PECAS') corTag = 'is-dark'; // Cinza Escuro
-                        %>
                         <span class="tag <%= corTag %> has-text-weight-bold">
                             <%= o.status %>
                         </span>
@@ -88,14 +92,12 @@
             <% }) %>
             <% if (ordens.length === 0) { %>
                 <tr>
-                    <td colspan="6" class="has-text-centered">Nenhuma ordem de serviço encontrada.</td>
+                    <td colspan="7" class="has-text-centered">Nenhuma ordem de serviço encontrada.</td>
                 </tr>
             <% } %>
         </tbody>
     </table>
 </div>
-
-
 
 <script>
 function filtrarTabela() {
@@ -112,19 +114,21 @@ function filtrarTabela() {
     for (let i = 1; i < tr.length; i++) {
         const tdId = tr[i].getElementsByTagName("td")[0];   
         const tdNome = tr[i].getElementsByTagName("td")[1]; 
-        const tdStatus = tr[i].getElementsByTagName("td")[3]; 
-        
+        const tdAparelho = tr[i].getElementsByTagName("td")[2]; // Coluna aparelho
+        const tdStatus = tr[i].getElementsByTagName("td")[4]; // Status agora é coluna 4
+
         if (tdId && tdNome && tdStatus) {
             const txtValueId = (tdId.textContent || tdId.innerText).toUpperCase();
             const txtValueNome = (tdNome.textContent || tdNome.innerText).toUpperCase();
+            const txtValueNomeLimpo = txtValueNome.replace(/[.\-/]/g, "");
+            const txtValueAparelho = tdAparelho ? (tdAparelho.textContent || tdAparelho.innerText).toUpperCase() : "";
             const txtValueStatus = (tdStatus.textContent || tdStatus.innerText).toUpperCase().trim();
             
-            const txtValueNomeLimpo = txtValueNome.replace(/[.\-/]/g, "");
-
-            // Lógica: Texto bate (ID/Nome/CPF) E Status bate
+            // Lógica: Texto bate (ID/Nome/CPF/Aparelho) E Status bate
             const bateTexto = txtValueId.indexOf(filterTexto) > -1 || 
-                             txtValueNome.indexOf(filterTexto) > -1 ||
-                             txtValueNomeLimpo.indexOf(filterTexto) > -1;
+                              txtValueNome.indexOf(filterTexto) > -1 ||
+                              txtValueNomeLimpo.indexOf(filterTexto) > -1 ||
+                              txtValueAparelho.indexOf(filterTexto) > -1;
             
             const bateStatus = filterStatus === "" || txtValueStatus === filterStatus;
 
