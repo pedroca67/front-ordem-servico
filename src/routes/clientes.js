@@ -44,10 +44,10 @@ router.post('/novo', async (req, res) => { // Recebe dados do formulário(post)
     try {
         const auth = api.getAuth(req); //Autenticação
         await api.post('/clientes', req.body, auth);//envia dados para API criar cliente
+        
+        // Define a mensagem de sucesso antes de redirecionar
+        req.flash('success_msg', 'Cliente cadastrado com sucesso!');
         res.redirect('/clientes');  // Volta para listagem
-
-        //Falta colocar mensagemde sucesso ao cadastrar
-
 
     } catch (error) {
         console.error("Erro ao salvar cliente:", error.response?.data || error.message);
@@ -74,10 +74,14 @@ router.get('/:id/excluir', async (req, res) => { // remove pelo id
     try {
         const auth = api.getAuth(req);
         await api.delete(`/clientes/${req.params.id}`, auth); //chama a api pra excluir
+        
+        // Adicionada mensagem de confirmação para exclusão
+        req.flash('success_msg', 'Cliente removido com sucesso!');
         res.redirect('/clientes'); //volta pra lista
     } catch (error) {
         console.error("Erro ao excluir cliente:", error.message);
-        res.status(500).send("Não foi possível excluir o cliente.");
+        req.flash('error_msg', 'Erro ao excluir cliente.');
+        res.redirect('/clientes');
     }
 });
 
@@ -108,6 +112,9 @@ router.post('/:id/editar', async (req, res) => {  // Recebe alterações do form
     try {
         const auth = api.getAuth(req);
         await api.put(`/clientes/${req.params.id}`, req.body, auth); // Atualiza cliente na API
+        
+        // Define a mensagem de sucesso antes de redirecionar
+        req.flash('success_msg', 'Dados do cliente atualizados com sucesso!');
         res.redirect('/clientes');  // Volta para lista
 
 

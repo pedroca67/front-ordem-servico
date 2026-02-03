@@ -1,6 +1,7 @@
 const express = require('express');
 const session = require('express-session');
 const path = require('path');
+const flash = require('connect-flash'); // Importa o connect-flash para mensagens de feedback
 require('dotenv').config(); // garante que o Node leia o .env
 
 const app = express();
@@ -20,6 +21,9 @@ app.use(session({
     saveUninitialized: true, // cria sessão mesmo sem dados (para o login)
     // cookie: { secure: false } // Em produção com HTTPS, mudar para true
 }));
+
+// CONFIGURAÇÃO DO FLASH (Deve vir após a sessão)
+app.use(flash());
 
 // 3. MIDDLEWARE DE PROTEÇÃO GLOBAL E RES.LOCALS
 app.use((req, res, next) => {
@@ -46,6 +50,10 @@ app.use((req, res, next) => {
         res.locals.papel = null; // sem role pra ele
         res.locals.paginaAtual = 'login'; // página atua será login
     }
+
+    // Disponibiliza as mensagens flash para todas as views EJS
+    res.locals.success_msg = req.flash('success_msg');
+    res.locals.error_msg = req.flash('error_msg');
 
     next();  // Continua para a próxima rota/middleware
 });

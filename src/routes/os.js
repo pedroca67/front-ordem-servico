@@ -46,9 +46,12 @@ router.post('/nova', async (req, res) => {
             aparelho: req.body.aparelho
         }, auth(req));
 
+        // Mensagem de sucesso ao criar OS
+        req.flash('success_msg', 'Ordem de Serviço aberta com sucesso!');
         res.redirect('/os');
     } catch {
-        res.status(500).send('Erro ao salvar OS');
+        req.flash('error_msg', 'Erro ao abrir Ordem de Serviço.');
+        res.redirect('/os/nova');
     }
 });
 
@@ -70,7 +73,10 @@ router.post('/:id/status', async (req, res) => {
             auth(req)
         );
         // Atualiza status da OS
+        req.flash('success_msg', 'Status da OS atualizado!');
 
+    } catch (error) {
+        req.flash('error_msg', 'Erro ao atualizar status.');
     } finally {
         res.redirect(`/os/${req.params.id}`);
         // Sempre volta pra página de detalhes
@@ -81,9 +87,11 @@ router.post('/:id/status', async (req, res) => {
 router.post('/:id/excluir', async (req, res) => {
     try {
         await api.delete(`/ordens-servico/${req.params.id}`, auth(req)); // Exclui OS no backend
+        req.flash('success_msg', 'Ordem de Serviço removida com sucesso!');
         res.redirect('/os');
     } catch {
-        res.status(500).send('Erro ao excluir a ordem.');
+        req.flash('error_msg', 'Erro ao excluir a ordem.');
+        res.redirect('/os');
     }
 });
 
@@ -112,9 +120,11 @@ router.post('/:id/editar', async (req, res) => {
             aparelho: req.body.aparelho
         }, auth(req)); // Salva alterações no backend
 
+        req.flash('success_msg', 'Dados da OS atualizados com sucesso!');
         res.redirect(`/os/${req.params.id}`);
     } catch {
-        res.status(500).send('Erro ao atualizar os dados.');
+        req.flash('error_msg', 'Erro ao atualizar dados da OS.');
+        res.redirect(`/os/${req.params.id}/editar`);
     }
 });
 

@@ -32,6 +32,8 @@ router.post('/salvar', async (req, res) => {
         }, auth(req));
         // Chama o backend para criar o usuário
 
+        // Define a mensagem de sucesso antes de redirecionar
+        req.flash('success_msg', 'Usuário cadastrado com sucesso!');
         res.redirect('/');
         // Se sucesso, volta pra home
 
@@ -48,7 +50,5 @@ router.post('/salvar', async (req, res) => {
     }
 });
 
-
-module.exports = router;
 
 module.exports = router;
