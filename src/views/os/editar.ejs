@@ -1,81 +1,81 @@
 <%- include("../partials/header") %>
-<%- include('../partials/messages') %>
+    <%- include('../partials/messages') %>
 
-    <div class="box">
-        <h1 class="title">Editar Ordem de Serviço #<%= ordem.id %>
-        </h1>
+        <div class="box">
+            <h1 class="title">Editar Ordem de Serviço #<%= ordem.id %>
+            </h1>
 
-        <form action="/os/<%= ordem.id %>/editar" method="POST">
-            <div class="field">
-                <label class="label">Cliente</label>
-                <div class="control">
-                    <input class="input is-static" type="text" value="<%= ordem.cliente ? ordem.cliente.nome : 'N/A' %>"
-                        readonly>
-                    <input type="hidden" name="clienteId" value="<%= ordem.cliente ? ordem.cliente.id : '' %>">
-                </div>
-            </div>
-            <div class="field">
-                <label class="label">Aparelho</label>
-                <div class="control">
-                    <input class="input" type="text" name="aparelho" placeholder=""
-                        required>
-                </div>
-            </div>
-
-
-            <div class="field">
-                <label class="label">Descrição do Problema</label>
-                <div class="control">
-                    <textarea class="textarea" name="descricaoProblema"
-                        required><%= ordem.descricaoProblema %></textarea>
-                </div>
-            </div>
-
-            <div class="columns">
-                <div class="column">
-                    <div class="field">
-                        <label class="label">Valor Atual (R$)</label>
-                        <div class="control">
-                            <input class="input" type="number" step="0.01" name="valor" value="<%= ordem.valor %>"
-                                required>
-                        </div>
+            <form action="/os/<%= ordem.id %>/editar" method="POST">
+                <div class="field">
+                    <label class="label">Cliente</label>
+                    <div class="control">
+                        <input class="input is-static" type="text"
+                            value="<%= ordem.cliente ? ordem.cliente.nome : 'N/A' %>" readonly>
+                        <input type="hidden" name="clienteId" value="<%= ordem.cliente ? ordem.cliente.id : '' %>">
                     </div>
                 </div>
-                <div class="column">
-                    <div class="field">
-                        <label class="label">Status</label>
-                        <div class="control">
-                            <div class="select is-fullwidth">
-                                <select name="status">
-                                    <option value="ABERTA" <%=ordem.status==='ABERTA' ? 'selected' : '' %>>ABERTA
-                                    </option>
-                                    <option value="EM_ANDAMENTO" <%=ordem.status==='EM_ANDAMENTO' ? 'selected' : '' %>
-                                        >EM ANDAMENTO</option>
-                                    <option value="AGUARDANDO_PECAS" <%=ordem.status==='AGUARDANDO_PECAS' ? 'selected'
-                                        : '' %>>AGUARDANDO PEÇAS</option>
-                                </select>
+                <div class="field">
+                    <label class="label">Aparelho</label>
+                    <div class="control">
+                        <input class="input" type="text" name="aparelho" value="<%= ordem.aparelho %>"
+                            placeholder="Ex: iphone 13" required>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label class="label">Descrição do Problema</label>
+                    <div class="control">
+                        <textarea class="textarea" name="descricaoProblema"
+                            required><%= ordem.descricaoProblema %></textarea>
+                    </div>
+                </div>
+
+                <div class="columns">
+                    <div class="column">
+                        <div class="field">
+                            <label class="label">Valor Atual (R$)</label>
+                            <div class="control">
+                                <input class="input" type="number" step="0.01" name="valor" value="<%= ordem.valor %>"
+                                    required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <div class="field">
+                            <label class="label">Status</label>
+                            <div class="control">
+                                <div class="select is-fullwidth">
+                                    <select name="status">
+                                        <option value="ABERTA" <%=ordem.status==='ABERTA' ? 'selected' : '' %>>ABERTA
+                                        </option>
+                                        <option value="EM_ANDAMENTO" <%=ordem.status==='EM_ANDAMENTO' ? 'selected' : ''
+                                            %>
+                                            >EM ANDAMENTO</option>
+                                        <option value="AGUARDANDO_PECAS" <%=ordem.status==='AGUARDANDO_PECAS'
+                                            ? 'selected' : '' %>>AGUARDANDO PEÇAS</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="field">
-                <label class="label">Observações Técnicas</label>
-                <div class="control">
-                    <textarea class="textarea" name="observacoes"><%= ordem.observacoes %></textarea>
+                <div class="field">
+                    <label class="label">Observações Técnicas</label>
+                    <div class="control">
+                        <textarea class="textarea" name="observacoes"><%= ordem.observacoes %></textarea>
+                    </div>
                 </div>
-            </div>
 
-            <div class="field is-grouped">
-                <div class="control">
-                    <button class="button is-link" type="submit">Salvar Alterações</button>
+                <div class="field is-grouped">
+                    <div class="control">
+                        <button class="button is-link" type="submit">Salvar Alterações</button>
+                    </div>
+                    <div class="control">
+                        <a href="/os/<%= ordem.id %>" class="button is-light">Cancelar</a>
+                    </div>
                 </div>
-                <div class="control">
-                    <a href="/os/<%= ordem.id %>" class="button is-light">Cancelar</a>
-                </div>
-            </div>
-        </form>
-    </div>
+            </form>
+        </div>
 
-    <%- include("../partials/footer") %>
+        <%- include("../partials/footer") %>

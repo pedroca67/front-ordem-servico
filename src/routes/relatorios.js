@@ -60,9 +60,9 @@ router.get('/', async (req, res) => {
     }
 
     // Renderiza a view relatorios/index.ejs
-    res.render('relatorios/index', viewData(req, {
-        dados,                          // Dados do relatório
-        filtros: { dataInicio, dataFim } // Mantém os filtros preenchidos na tela
+    res.render('relatorios/index', viewData(req, { 
+                                  // Dados do relatório
+       dados, filtros: { dataInicio, dataFim } // Mantém os filtros preenchidos na tela
     }));
 });
 

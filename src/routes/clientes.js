@@ -28,6 +28,12 @@ router.get('/', async (req, res) => { //rota principal /clientes
     }
 });
 
+
+
+// --------------------------------------------------------------------------------------------
+
+
+
 // FORMULÁRIO NOVO CLIENTE
 router.get('/novo', (req, res) => { //abre formulario(get)
     res.render('clientes/novo', {
@@ -69,6 +75,12 @@ router.post('/novo', async (req, res) => { // Recebe dados do formulário(post)
     }
 });
 
+
+
+// -----------------------------------------------------------------------------------
+
+
+
 // EXCLUIR CLIENTE
 router.get('/:id/excluir', async (req, res) => { // remove pelo id
     try {
@@ -84,6 +96,11 @@ router.get('/:id/excluir', async (req, res) => { // remove pelo id
         res.redirect('/clientes');
     }
 });
+
+
+// -------------------------------------------------------------------------------
+
+
 
 // EXIBIR FORMULÁRIO DE EDIÇÃO
 router.get('/:id/editar', async (req, res) => { // Abre formulário já preenchido
@@ -136,6 +153,12 @@ router.post('/:id/editar', async (req, res) => {  // Recebe alterações do form
         });
     }
 });
+
+
+// ----------------------------------------------------------------------------
+
+
+
 // Adicione esta rota ao seu arquivo para testar a busca
 router.get('/api/buscar', async (req, res) => {
     try {

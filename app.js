@@ -11,7 +11,7 @@ app.set('view engine', 'ejs'); // renderiza páginas .ejs
 app.set('views', path.join(__dirname, 'src', 'views')); // isnforma onde ficam os arquivos .ejs (pasta views)
 app.use(express.urlencoded({ extended: true }));// Permite receber dados de formulários (POST)
 app.use(express.json()); // Permite receber dados em JSON
-app.use(express.static(path.join(__dirname, 'public'))); // Libera a pasta public para arquivos estáticos
+app.use(express.static(path.join(__dirname, 'src', 'public'))); // Libera a pasta public para arquivos estáticos
 
 
 // 2. CONFIGURAÇÃO DE SESSÃO
@@ -27,35 +27,50 @@ app.use(flash());
 
 // 3. MIDDLEWARE DE PROTEÇÃO GLOBAL E RES.LOCALS
 app.use((req, res, next) => {
-    const rotaSolicitada = req.path; //pega o caminho da URL atual (ex: /clientes)
+    const rotaSolicitada = req.path;
+    const rotasPublicas = ['/login', '/css', '/js', '/img', '/public', '/favicon'];
+    const ehPublica = rotasPublicas.some(publica => rotaSolicitada.startsWith(publica));
 
-    const rotasPublicas = ['/login', '/css', '/js', '/img']; //rotas que não precisam de login
-
-    const ehPublica = rotasPublicas.some(publica => rotaSolicitada.startsWith(publica)); //verifica se a rota atual começa com alguma rota pública (ex: /login/...)
-
-
-    // Se não for pública e nao estiver logado 
     if (!ehPublica && !req.session.usuarioLogado) {
-        return res.redirect('/login'); //Bloqueia e manda para o Login
+        return res.redirect('/login');
     }
 
-    // Configura variáveis globais para os arquivos .EJS (Header/Menu)
+// --- NOVA TRAVA DE SEGURANÇA (AUTORIZAÇÃO) ---
+if (req.session.usuarioLogado) {
+    // Pegamos o papel e garantimos que estamos tratando "ROLE_ADMIN" ou "ADMIN"
+    const papel = req.session.usuarioLogado.papel;
+
+    // Criamos uma lógica que aceita tanto "ADMIN" quanto "ROLE_ADMIN"
+    const ehAdmin = (papel === 'ADMIN' || papel === 'ROLE_ADMIN');
+
+    const rotasRestritasAdmin = ['/usuarios', '/relatorios'];
+    const tentaAcessarRestrito = rotasRestritasAdmin.some(restrita => rotaSolicitada.startsWith(restrita));
+
+    // SE NÃO FOR ADMIN e tentar acessar área restrita, barramos
+    if (!ehAdmin && tentaAcessarRestrito) {
+        req.flash('error_msg', 'Acesso negado: apenas administradores podem acessar esta área.');
+        return res.redirect('/'); 
+    }
+    
+    // O Funcionário (ROLE_USER) passará direto por aqui e seguirá para o next()
+}
+    // ---------------------------------------------
+
+    // Configura variáveis globais para os arquivos .EJS
     if (req.session.usuarioLogado) {
-        // CORREÇÃO: Acessando diretamente .nome e .papel (estrutura segura)
-        res.locals.usuario = req.session.usuarioLogado.nome || 'Usuário'; //nome do usuário no topo
-        res.locals.papel = req.session.usuarioLogado.papel || 'USER'; //cargo do usuário no topo
-        res.locals.paginaAtual = rotaSolicitada.split('/')[1] || 'dashboard'; //VERIFICAR ISSO AQUIII
+        res.locals.usuario = req.session.usuarioLogado.nome || 'Usuário';
+        res.locals.papel = req.session.usuarioLogado.papel || 'USER';
+        res.locals.paginaAtual = rotaSolicitada.split('/')[1] || 'dashboard';
     } else {
-        res.locals.usuario = null; //sem usuario logado
-        res.locals.papel = null; // sem role pra ele
-        res.locals.paginaAtual = 'login'; // página atua será login
+        res.locals.usuario = null;
+        res.locals.papel = null;
+        res.locals.paginaAtual = 'login';
     }
 
-    // Disponibiliza as mensagens flash para todas as views EJS
     res.locals.success_msg = req.flash('success_msg');
     res.locals.error_msg = req.flash('error_msg');
 
-    next();  // Continua para a próxima rota/middleware
+    next();
 });
 
 // 4. IMPORTAÇÃO E USO DAS ROTAS

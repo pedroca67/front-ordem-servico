@@ -23,6 +23,8 @@ router.get('/', async (req, res) => {
 
         res.render('index', viewData(req, { // Renderiza index.ejs com dados padrão + extras
             totalClientes, osAbertas: stats.qtdAbertas || 0,
+
+            
             faturamento: Number(stats.faturamentoTotal || 0)
                 .toLocaleString('pt-BR', { minimumFractionDigits: 2 }) //limitar a 2 digitos depois da , .
         }));

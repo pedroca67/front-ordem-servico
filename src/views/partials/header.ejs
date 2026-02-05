@@ -1,13 +1,19 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <title>Sistema TechOS</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link rel="icon" href="/favi.ico">
+    <link rel="icon" type="image/png" href="/favi.png">
+
 </head>
+
 <body class="has-background-light">
-    
+
     <nav class="navbar is-dark mb-5">
         <div class="navbar-brand">
             <a class="navbar-item has-text-weight-bold is-size-4" href="/">
@@ -18,49 +24,52 @@
 
         <div class="navbar-menu">
             <div class="navbar-start">
-                
-                <% if(locals.papel === 'ADMIN') { %>
+
+                <% if(locals.papel==='ADMIN' ) { %>
                     <a href="/" class="navbar-item <%= locals.paginaAtual == 'dashboard' ? 'is-active' : '' %>">
                         Dashboard
                     </a>
-                <% } %>
+                    <% } %>
 
-                <a href="/clientes" class="navbar-item <%= locals.paginaAtual == 'clientes' ? 'is-active' : '' %>">
-                    Clientes
-                </a>
+                        <a href="/clientes"
+                            class="navbar-item <%= locals.paginaAtual == 'clientes' ? 'is-active' : '' %>">
+                            Clientes
+                        </a>
 
-                <a href="/os" class="navbar-item <%= locals.paginaAtual == 'os' ? 'is-active' : '' %>">
-                    Ordens de Serviço
-                </a>
+                        <a href="/os" class="navbar-item <%= locals.paginaAtual == 'os' ? 'is-active' : '' %>">
+                            Ordens de Serviço
+                        </a>
 
-                <% if(locals.papel === 'ADMIN') { %>
-                    <a href="/relatorios" class="navbar-item <%= locals.paginaAtual == 'relatorios' ? 'is-active' : '' %>">
-                        Relatórios
-                    </a>
-                <% } %>
+                        <% if(locals.papel==='ADMIN' ) { %>
+                            <a href="/relatorios"
+                                class="navbar-item <%= locals.paginaAtual == 'relatorios' ? 'is-active' : '' %>">
+                                Relatórios
+                            </a>
+                            <% } %>
 
-                <% if(locals.papel === 'ADMIN') { %>
-                    <a href="/usuarios/novo" class="navbar-item <%= locals.paginaAtual == 'admin' ? 'is-active' : '' %>">
-                        <span class="has-text-warning has-text-weight-bold">Cadastrar Usuário</span>
-                    </a>
-                <% } %>
+                                <% if(locals.papel==='ADMIN' ) { %>
+                                    <a href="/usuarios/novo"
+                                        class="navbar-item <%= locals.paginaAtual == 'admin' ? 'is-active' : '' %>">
+                                        <span class="has-text-warning has-text-weight-bold">Cadastrar Usuário</span>
+                                    </a>
+                                    <% } %>
             </div>
 
             <div class="navbar-end">
                 <div class="navbar-item">
                     <% if(locals.usuario) { %>
                         <span class="tag is-info is-medium mr-3">
-                            <i class="fa-solid fa-user mr-2"></i> 
-                            <%= usuario %> 
-                            <span class="is-size-7 ml-1">(<%= papel %>)</span>
+                            <i class="fa-solid fa-user mr-2"></i>
+                            <%= usuario %>
+                                <span class="is-size-7 ml-1">(<%= papel %>)</span>
                         </span>
                         <a href="/logout" class="button is-danger is-small">
                             <i class="fa-solid fa-right-from-bracket mr-1"></i> Sair
                         </a>
-                    <% } %>
+                        <% } %>
                 </div>
             </div>
         </div>
     </nav>
-    
+
     <div class="container pb-6">

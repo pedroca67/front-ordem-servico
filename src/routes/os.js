@@ -24,6 +24,11 @@ router.get('/', async (req, res) => {
     }
 });
 
+
+// ----------------------------------------------------------------------------------------
+
+
+
 // NOVA (FORM)
 router.get('/nova', async (req, res) => {
     try {
@@ -55,6 +60,11 @@ router.post('/nova', async (req, res) => {
     }
 });
 
+
+
+// --------------------------------------------------------------------------------------------
+
+
 // DETALHES
 router.get('/:id', async (req, res) => {
     try {
@@ -64,6 +74,11 @@ router.get('/:id', async (req, res) => {
         res.redirect('/os'); // Se não encontrar, volta pra lista
     }
 });
+
+
+
+// --------------------------------------------------------------------------------------------------
+
 
 // ATUALIZAR STATUS
 router.post('/:id/status', async (req, res) => {
@@ -83,6 +98,11 @@ router.post('/:id/status', async (req, res) => {
     }
 });
 
+
+// ----------------------------------------------------------------------------------------------
+
+
+
 // EXCLUIR
 router.post('/:id/excluir', async (req, res) => {
     try {
@@ -94,6 +114,13 @@ router.post('/:id/excluir', async (req, res) => {
         res.redirect('/os');
     }
 });
+
+
+
+
+// ------------------------------------------------------------------------------------------
+
+
 
 // EDITAR (FORM)
 router.get('/:id/editar', async (req, res) => {

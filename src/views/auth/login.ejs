@@ -18,9 +18,10 @@
 
             <% if (typeof erro !== 'undefined') { %>
                 <div class="notification is-danger is-light">
-                    <%= erro %>
+                    <%= erro %> <!-- erro vindo da mensagem do back -->
                 </div>
-            <% } %>
+            <% } %> 
+          
 
             <form action="/login" method="POST">
                 <div class="field">

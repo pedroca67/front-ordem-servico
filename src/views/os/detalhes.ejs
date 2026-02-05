@@ -11,6 +11,7 @@
                     <div class="select mr-2">
                         <select name="status">
                             <option value="ABERTA" <%= ordem.status==='ABERTA' ? 'selected' : '' %>>ABERTA</option>
+                            
                             <option value="EM_ANDAMENTO" <%= ordem.status==='EM_ANDAMENTO' ? 'selected' : '' %>>EM ANDAMENTO</option>
                             <option value="AGUARDANDO_PECAS" <%= ordem.status==='AGUARDANDO_PECAS' ? 'selected' : '' %>>AGUARDANDO PEÇAS</option>
                             <option value="CONCLUIDA" <%= ordem.status==='CONCLUIDA' ? 'selected' : '' %>>CONCLUÍDA</option>
